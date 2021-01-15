@@ -10,8 +10,8 @@ public class GripperControls {
 
     public Servo gripper = null;
 
-    private double _gripPosOpen = 0.0;
-    private double _gripPosClose = 0.65;
+    public double _gripPosOpen = 0.0;
+    public double _gripPosClose = 0.75;
     private double _gripPosRing = 0.5;
     private double _gripPosCurrent = _gripPosClose;
     private boolean _flickerKicking = false;

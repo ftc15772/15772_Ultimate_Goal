@@ -113,8 +113,14 @@ public class ShooterPID1Encoder {
 
         _currentPower = (_P * _error + _I * _Integral + _D * _Derivative) / MAX_TICKS_PER_SECOND;
         _currentPower = Range.clip(_currentPower, 0.0, 1.0);
-        _primaryMotor.setPower(_currentPower);
-        _secondaryMotor.setPower(_currentPower);
+
+        if (_targetTicksPerSecond <= 0) {
+            _primaryMotor.setPower(0.0);
+            _secondaryMotor.setPower(0.0);
+        } else {
+            _primaryMotor.setPower(_currentPower);
+            _secondaryMotor.setPower(_currentPower);
+        }
 
         _lastTime = currentTime;
         _lastTicks = currentTicks;
@@ -130,11 +136,16 @@ public class ShooterPID1Encoder {
         double newRPM = _targetRPM;
 
         if (!_dpadUp && gamepad.dpad_up) {
-            newRPM = Range.clip(newRPM + RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
+            //newRPM = Range.clip(newRPM + RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
+            newRPM = 3800.0;
             this.setByRPM(newRPM);
         } else if (!_dpadDown && gamepad.dpad_down) {
-            newRPM = Range.clip(newRPM - RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
+            //newRPM = Range.clip(newRPM - RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
+            newRPM = 0.0;
             this.setByRPM(newRPM);
+
+            _primaryMotor.setPower(0.0);
+            _secondaryMotor.setPower(0.0);
         }
         _dpadUp = gamepad.dpad_up;
         _dpadDown = gamepad.dpad_down;

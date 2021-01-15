@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ArmControls {
 
     public DcMotor arm = null;
-    private double _powerArm = 0.0;
-    private double _encoderArm = 0.0;
+    public double _powerArm = 0.0;
+    public double _encoderArm = 0.0;
     private double _lowLimit = 50.0;
     private double _highLimit = 9000.0;
     private double _y = 0.0;

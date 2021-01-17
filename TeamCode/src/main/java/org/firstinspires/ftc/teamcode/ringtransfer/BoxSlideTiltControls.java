@@ -41,7 +41,16 @@ public class BoxSlideTiltControls {
             _sliderIn = true;
             _lastBoxInShooterPos = false;
         }
+    }
 
+    public void autoBoxIntakePos (double time, double _lastTime) {
+        boxTilterControls.tilter.setPosition(_tiltDown);
+        _tiltingDown = true;
+        if ((time - _lastTime) > 800) {
+            boxSliderControls.slider.setPosition(_slideIn);
+            _sliderIn = true;
+            _lastBoxInShooterPos = false;
+        }
     }
 
     public void boxShootPos (double time) {

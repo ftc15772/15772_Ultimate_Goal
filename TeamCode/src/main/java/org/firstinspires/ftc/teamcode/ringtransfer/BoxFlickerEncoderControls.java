@@ -12,7 +12,7 @@ public class BoxFlickerEncoderControls {
     public CRServo flicker = null;
     public DcMotor flickEncoder = null;
 
-    private boolean _flickerKicking = false;
+    public boolean _flickerKicking = false;
     private boolean _startButton = false;
     private double _encoderValue;
     private double _lastEncoderValue = 0.0;

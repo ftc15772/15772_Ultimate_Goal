@@ -127,6 +127,41 @@ public class ShooterPID1Encoder {
         _lastError = _error;
     }
 
+    public void shooterAuto (LinearOpMode op, double _targetRPM) {
+        double newRPM = _targetRPM;
+        this.setByRPM(newRPM);
+
+        double currentTime = _runtime.seconds();
+        double deltaTime = currentTime - _lastTime;
+        if (deltaTime < 0.1) {
+            return;
+        }
+        double currentTicks = _primaryMotor.getCurrentPosition();
+        double deltaTicks = currentTicks - _lastTicks;
+        _measuredTicksPerSecond = deltaTicks / deltaTime;
+        _measuredRPM = TICKS_PER_SECOND_TO_RPM(_measuredTicksPerSecond);
+
+        _error = _targetTicksPerSecond - _measuredTicksPerSecond;
+        double deltaError = _error - _lastError;
+        _Derivative = deltaError / deltaTime;
+        _Integral += (_error * deltaTime);
+
+        _currentPower = (_P * _error + _I * _Integral + _D * _Derivative) / MAX_TICKS_PER_SECOND;
+        _currentPower = Range.clip(_currentPower, 0.0, 1.0);
+
+        if (_targetTicksPerSecond <= 0) {
+            _primaryMotor.setPower(0.0);
+            _secondaryMotor.setPower(0.0);
+        } else {
+            _primaryMotor.setPower(_currentPower);
+            _secondaryMotor.setPower(_currentPower);
+        }
+
+        _lastTime = currentTime;
+        _lastTicks = currentTicks;
+        _lastError = _error;
+    }
+
     public void stop () {
         _primaryMotor.setPower(0.0);
         _secondaryMotor.setPower(0.0);

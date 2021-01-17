@@ -1,14 +1,22 @@
-package org.firstinspires.ftc.teamcode.odometry;
+package org.firstinspires.ftc.teamcode.auto;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.vuforia.CameraDevice;
 
-import org.firstinspires.ftc.teamcode.auto.ParallelActionsControls;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.odometry.OdometryGlobalCoordinatePosition;
 
-@Autonomous(name = "My Odometry Vector Mecanum")
-public class MyOdometryVectorMecanum extends LinearOpMode {
+import java.util.List;
+
+@Autonomous(name = "Red Auto")
+public class RedAuto extends LinearOpMode {
 
     private ParallelActionsControls parallelActionsControls = new ParallelActionsControls();
 
@@ -19,20 +27,42 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
 
     final double COUNTS_PER_INCH = (8192/5.93687);
 
-    double _permanentX = 8; //inches
-    double _permanentY = 6; //inches
+    double _permanentX = 116.25; //inches
+    double _permanentY = 9; //inches
     double _xFromPermanentPoint;
     double _yFromPermanentPoint;
-    double _time;
     //public String _state = "none";
+    ElapsedTime Timer;
+    double _time = 0.0;
+    double _lastTime = 0.0;
+    String _ringType = "notDetected"; //"notDetected" to start, then none = "none", one is "one", and four is "four"
+    private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Quad";
+    private static final String LABEL_SECOND_ELEMENT = "Single";
 
             //Hardware Map Names for drive motors and odometry wheels. THIS WILL CHANGE ON EACH ROBOT, YOU NEED TO UPDATE THESE VALUES ACCORDINGLY
     String rfName = "FR", rbName = "BR", lfName = "FL", lbName = "BL";
     String verticalLeftEncoderName = "FL", verticalRightEncoderName = "BL", horizontalEncoderName = "BR";
     OdometryGlobalCoordinatePosition globalPositionUpdate;
 
+    private static final String VUFORIA_KEY =
+            " Ac/2h37/////AAABmbXAvaZQqkPSlZv4583jp15xBpCuzySKMfid1ppM+8fZbZsGd93ri87TKmjKKCYA64DjBiSRboJvg0eldCw/QzbXtH/gNzdbd90bD226N+MA3p3b4CH+C8Pe+Q2SPV5d4e23K514g/DZGu5JEHHH5kl1guWLfc485PCIGE/wlhIprwSQmGM535rO6oif8Dka9K6zFPkiiSvsj4SoTdVJ9EMPnSYT1LNRUtcWWyN0aCVFJ2cmU2lCAtvS6t7GACGTQAbq+vURBnS0BLwkqgebDbvPPM6y4LOG904dFosYxQsSJw51CCTDNLXlunkQcEzp8DSjH79jiTb6BMwGtpRbFhyGrtSq+ugYlE6uf+C7V913 ";
+
+    private VuforiaLocalizer vuforia;
+    private TFObjectDetector tfod;
+
     @Override
     public void runOpMode() throws InterruptedException {
+
+        initVuforia();
+        initTfod();
+
+        if (tfod != null) {
+            tfod.activate();
+            tfod.setClippingMargins(0,250,0,0);
+            //                      L T R B
+        }
+
         //Initialize hardware map values. PLEASE UPDATE THESE VALUES TO MATCH YOUR CONFIGURATION
         initDriveHardwareMap(rfName, rbName, lfName, lbName, verticalLeftEncoderName, verticalRightEncoderName, horizontalEncoderName);
 
@@ -40,32 +70,116 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
         //verticalRight.setDirection(DcMotorSimple.Direction.REVERSE);
         //verticalLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        CameraDevice.getInstance().setFlashTorchMode(true);
+
         parallelActionsControls.initialize(this);
+
 
         telemetry.addData("Status", "Init Complete");
         telemetry.update();
         waitForStart();
+
+        parallelActionsControls.startControl();
+
+        Timer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+        Timer.reset();
 
         //Create and start GlobalCoordinatePosition thread to constantly update the global coordinate positions
         globalPositionUpdate = new OdometryGlobalCoordinatePosition(verticalLeft, verticalRight, horizontal, COUNTS_PER_INCH, 75);
         Thread positionThread = new Thread(globalPositionUpdate);
         positionThread.start();
 
-        goToPosition("placeWobble", 12*COUNTS_PER_INCH, 32*COUNTS_PER_INCH, 0.35, 45, 1.5*COUNTS_PER_INCH);
-        parallelActionsControls._state = "ungripWobble";
-        parallelActionsControls.wobbleGoal();
-        sleep(250);
-        goToPosition("raiseWobble", 8*COUNTS_PER_INCH, 29*COUNTS_PER_INCH, 0.3, 45, 1.5*COUNTS_PER_INCH);
-        goToPosition("raiseWobble", 24*COUNTS_PER_INCH, 8*COUNTS_PER_INCH, 0.35, 0, 1.5*COUNTS_PER_INCH);
+        List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+        if (updatedRecognitions != null) {
+            telemetry.addData("# Object Detected", updatedRecognitions.size());
+            int i = 0;
+            for (Recognition recognition : updatedRecognitions) {
+                telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                if (recognition.getLabel() == "Single") {
+                    _ringType = "one";
+                } else if (recognition.getLabel() == "Quad") {
+                    _ringType = "four";
+                }
+            }
+        }
+        if (_ringType == "notDetected") {
+            goToPosition("none", 106*COUNTS_PER_INCH,15*COUNTS_PER_INCH,0.4,0, 3*COUNTS_PER_INCH);
+            right_front.setPower(0);
+            right_back.setPower(0);
+            left_front.setPower(0);
+            left_back.setPower(0);
+            while (_ringType == "notDetected") {
+                _time = Timer.milliseconds();
+                updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    int i = 0;
+                    for (Recognition recognition : updatedRecognitions) {
+                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                        if (recognition.getLabel() == "Single") {
+                            _ringType = "one";
+                        } else if (recognition.getLabel() == "Quad") {
+                            _ringType = "four";
+                        }
+                    }
+                }
+                if ((_time > 5000) && (_ringType == "notDetected")) {
+                    _ringType = "none";
+                }
+            }
+        }
 
+        goToPosition("none", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.6, 0, 2*COUNTS_PER_INCH);
 
-        parallelActionsControls.stop(this, _time);
+        //if (_ringType == "four") {
+        if ((_ringType != "notDetected")) {
+            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.75, 0, 2.5*COUNTS_PER_INCH);
+            goToPosition("placeWobble", 121*COUNTS_PER_INCH, 115*COUNTS_PER_INCH, 0.5, 45, 4*COUNTS_PER_INCH);
+        }
         right_front.setPower(0);
         right_back.setPower(0);
         left_front.setPower(0);
         left_back.setPower(0);
+        parallelActionsControls._state = "ungripWobble";
+        parallelActionsControls.wobbleGoal();
+        sleep(300);
+        //if (_ringType == "four") {
+        if ((_ringType != "notDetected")) {
+            goToPosition("raiseWobble", 112*COUNTS_PER_INCH, 106*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
+        }
+        goToPosition("prepareShooter", 105*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.6, 8, 2*COUNTS_PER_INCH);
 
-        while(opModeIsActive()){
+
+        right_front.setPower(0);
+        right_back.setPower(0);
+        left_front.setPower(0);
+        left_back.setPower(0);
+        parallelActionsControls._state = "shoot3Rings";
+        _time = Timer.milliseconds();
+        parallelActionsControls.shooterComponents(this, Timer.milliseconds());
+        parallelActionsControls.stop(this, Timer.milliseconds());
+
+        goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 80*COUNTS_PER_INCH, 0.3, 0, 1.5*COUNTS_PER_INCH);
+
+
+        right_front.setPower(0);
+        right_back.setPower(0);
+        left_front.setPower(0);
+        left_back.setPower(0);
+        _time = Timer.milliseconds();
+        parallelActionsControls._state = "resetBox";
+        _lastTime = _time = Timer.milliseconds();
+        while (parallelActionsControls._state == "resetBox") {
+            _time = Timer.milliseconds();
+            parallelActionsControls.resetBox(_time, _lastTime);
+        }
+        sleep(1000);
+
+
+
+        /* while(opModeIsActive()){
+            telemetry.addData("Ring Type", _ringType);
+
             //Display Global (x, y, theta) coordinates
             telemetry.addData("X Position", _xFromPermanentPoint);
             telemetry.addData("Y Position", _yFromPermanentPoint);
@@ -77,9 +191,10 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
 
             telemetry.addData("Thread Active", positionThread.isAlive());
             telemetry.update();
-        }
+        } */
 
-        parallelActionsControls.stop(this, _time);
+        _time = Timer.milliseconds();
+        parallelActionsControls.stop(this, Timer.milliseconds());
         //Stop the thread
         globalPositionUpdate.stop();
 
@@ -137,10 +252,13 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
             left_back.setPower(-_powerBL);
             right_back.setPower(-_powerBR);
 
+            _time = Timer.milliseconds();
             parallelActionsControls._state = state;
             parallelActionsControls.wobbleGoal();
+            parallelActionsControls.shooterComponents(this, _time);
 
             //Display Global (x, y, theta) coordinates
+            telemetry.addData("Ring Type", _ringType);
             telemetry.addData("X Position", _xFromPermanentPoint);
             telemetry.addData("Y Position", _yFromPermanentPoint);
             telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
@@ -209,5 +327,32 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
      */
     private double calculateY(double desiredAngle, double speed) {
         return Math.cos(Math.toRadians(desiredAngle)) * speed;
+    }
+
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minResultConfidence = 0.8f;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 }

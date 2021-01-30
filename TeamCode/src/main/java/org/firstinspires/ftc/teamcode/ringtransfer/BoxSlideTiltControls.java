@@ -7,7 +7,7 @@ public class BoxSlideTiltControls {
 
     boolean _timeCheck = false;
     double _lastTime = 0.0;
-    private boolean _b = false;
+    private boolean _dpadLeft = false;
     public boolean _currentBoxInShooterPos = false;
     public boolean _lastBoxInShooterPos = false;
 
@@ -27,10 +27,10 @@ public class BoxSlideTiltControls {
     }
 
     public void readController (Gamepad gamepad) {
-        if (gamepad.b && !_b) {
+        if (gamepad.dpad_left && !_dpadLeft) {
             _currentBoxInShooterPos =! _currentBoxInShooterPos;
         }
-        _b = gamepad.b;
+        _dpadLeft = gamepad.dpad_left;
     }
 
     public void boxIntakePos (double time) {

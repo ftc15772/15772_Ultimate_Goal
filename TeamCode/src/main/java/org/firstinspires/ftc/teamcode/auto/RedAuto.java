@@ -129,12 +129,18 @@ public class RedAuto extends LinearOpMode {
             }
         }
 
-        goToPosition("none", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.6, 0, 2*COUNTS_PER_INCH);
+        goToPosition("placeWobble", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.6, 0, 2*COUNTS_PER_INCH);
 
-        //if (_ringType == "four") {
-        if ((_ringType != "notDetected")) {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.75, 0, 2.5*COUNTS_PER_INCH);
+        if (_ringType == "four") {
+            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.7, 0, 2.5*COUNTS_PER_INCH);
             goToPosition("placeWobble", 121*COUNTS_PER_INCH, 115*COUNTS_PER_INCH, 0.5, 45, 4*COUNTS_PER_INCH);
+        } else if (_ringType == "one") {
+            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.7, 0, 4*COUNTS_PER_INCH);
+            //goToPosition("placeWobble", 98*COUNTS_PER_INCH, 89*COUNTS_PER_INCH, 0.5, 45, 3*COUNTS_PER_INCH);
+            goToPosition("placeWobble", 110*COUNTS_PER_INCH, 90*COUNTS_PER_INCH, 0.5, 0, 2.5*COUNTS_PER_INCH);
+        } else if (_ringType == "none") {
+            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.4, 25, 4*COUNTS_PER_INCH);
+            goToPosition("placeWobble", 124*COUNTS_PER_INCH, 67*COUNTS_PER_INCH, 0.4, 45, 2.5*COUNTS_PER_INCH);
         }
         right_front.setPower(0);
         right_back.setPower(0);
@@ -143,9 +149,13 @@ public class RedAuto extends LinearOpMode {
         parallelActionsControls._state = "ungripWobble";
         parallelActionsControls.wobbleGoal();
         sleep(300);
-        //if (_ringType == "four") {
-        if ((_ringType != "notDetected")) {
-            goToPosition("raiseWobble", 112*COUNTS_PER_INCH, 106*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
+        if (_ringType == "four") {
+            goToPosition("prepareShooter", 112*COUNTS_PER_INCH, 106*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
+        } else if (_ringType == "one") {
+            //goToPosition("prepareShooter", 94*COUNTS_PER_INCH, 83*COUNTS_PER_INCH, 0.4, 45, 2*COUNTS_PER_INCH);
+            goToPosition("prepareShooter", 110*COUNTS_PER_INCH, 85*COUNTS_PER_INCH, 0.4, 0, 2*COUNTS_PER_INCH);
+        } else if (_ringType == "none") {
+            goToPosition("prepareShooter", 120*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.3, 45, 2*COUNTS_PER_INCH);
         }
         goToPosition("prepareShooter", 105*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.6, 8, 2*COUNTS_PER_INCH);
 
@@ -155,8 +165,11 @@ public class RedAuto extends LinearOpMode {
         left_front.setPower(0);
         left_back.setPower(0);
         parallelActionsControls._state = "shoot3Rings";
-        _time = Timer.milliseconds();
-        parallelActionsControls.shooterComponents(this, Timer.milliseconds());
+        while (parallelActionsControls._state != "none") {
+            _time = Timer.seconds();
+            parallelActionsControls.shooterComponents(this, _time, telemetry);
+            telemetry.update();
+        }
         parallelActionsControls.stop(this, Timer.milliseconds());
 
         goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 80*COUNTS_PER_INCH, 0.3, 0, 1.5*COUNTS_PER_INCH);
@@ -255,7 +268,7 @@ public class RedAuto extends LinearOpMode {
             _time = Timer.milliseconds();
             parallelActionsControls._state = state;
             parallelActionsControls.wobbleGoal();
-            parallelActionsControls.shooterComponents(this, _time);
+            parallelActionsControls.shooterComponents(this, _time, telemetry);
 
             //Display Global (x, y, theta) coordinates
             telemetry.addData("Ring Type", _ringType);

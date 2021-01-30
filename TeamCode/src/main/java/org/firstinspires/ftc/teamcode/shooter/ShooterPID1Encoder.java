@@ -94,8 +94,9 @@ public class ShooterPID1Encoder {
         _targetTicksPerSecond = RPM_TO_TICKS_PER_SECOND(_targetRPM);
     }
 
-    public void whileOpModeIsActive (LinearOpMode op) {
-        this.readController(op.gamepad2);
+    public void shooterAuto (LinearOpMode op, double targetRPM, double time) {
+        double newRPM = targetRPM;
+        this.setByRPM(newRPM);
         double currentTime = _runtime.seconds();
         double deltaTime = currentTime - _lastTime;
         if (deltaTime < 0.1) {
@@ -127,10 +128,9 @@ public class ShooterPID1Encoder {
         _lastError = _error;
     }
 
-    public void shooterAuto (LinearOpMode op, double _targetRPM) {
-        double newRPM = _targetRPM;
-        this.setByRPM(newRPM);
 
+    public void whileOpModeIsActive (LinearOpMode op) {
+        this.readController(op.gamepad2);
         double currentTime = _runtime.seconds();
         double deltaTime = currentTime - _lastTime;
         if (deltaTime < 0.1) {

@@ -10,8 +10,6 @@ import org.firstinspires.ftc.teamcode.intake.IntakeControls;
 import org.firstinspires.ftc.teamcode.odometry.OdometryControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxSliderControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxTilterControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
 import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
@@ -31,8 +29,6 @@ public class FullRobotTeleop2 extends LinearOpMode {
     private ComplicatedSnowplowControls plowControls = new ComplicatedSnowplowControls();
     private GripperControls gripperControls = new GripperControls();
     private BoxFlickerEncoderControls flickerControls = new BoxFlickerEncoderControls();
-    private BoxSliderControls boxSliderControls = new BoxSliderControls();
-    private BoxTilterControls boxTilterControls = new BoxTilterControls();
     private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
     //private TimerControls timer = new TimerControls();
 

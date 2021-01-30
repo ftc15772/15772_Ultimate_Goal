@@ -13,7 +13,8 @@ public class BoxFlickerEncoderControls {
     public DcMotor flickEncoder = null;
 
     public boolean _flickerKicking = false;
-    private boolean _startButton = false;
+    private boolean _rightDpad = false;
+    private boolean _rightBumper;
     private double _encoderValue;
     private double _lastEncoderValue = 0.0;
     private double _oneRing = -4150.0;
@@ -32,10 +33,12 @@ public class BoxFlickerEncoderControls {
     }
 
     public void readController (Gamepad gamepad) {
-        if (gamepad.start && !_startButton) {
+        if (gamepad.dpad_right && !_rightDpad) {
             _flickerKicking =! _flickerKicking;
         }
-        _startButton = gamepad.start;
+        _rightDpad = gamepad.dpad_right;
+
+        _rightBumper = gamepad.right_bumper;
     }
 
     public void whileOpModeIsActive (LinearOpMode op, double time) {
@@ -45,7 +48,7 @@ public class BoxFlickerEncoderControls {
         if (_flickerKicking == true) {
             _timeCheck = false;
             _encoderValue = flickEncoder.getCurrentPosition();
-            if ((time - _lastTime) < 0.52) {
+            if ((time - _lastTime) < 1.0) {
                 flicker.setPower(-1.0);
             } else {
                 _flickerKicking = false;
@@ -62,6 +65,8 @@ public class BoxFlickerEncoderControls {
             }
              */
 
+        } else if (_rightBumper == true) {
+            flicker.setPower(-0.25);
         } else {
             flicker.setPower(0.0);
             _lastEncoderValue = _encoderValue;

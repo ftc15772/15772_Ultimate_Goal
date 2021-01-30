@@ -19,10 +19,10 @@ public class MecanumDrivebase {
     private double _magnitude = 0.0;
     private double _theta = 0.0;
     private double _turnRate = 0.0;
-    private double _powerFL = 0.0;
-    private double _powerFR = 0.0;
-    private double _powerBL = 0.0;
-    private double _powerBR = 0.0;
+    public double _powerFL = 0.0;
+    public double _powerFR = 0.0;
+    public double _powerBL = 0.0;
+    public double _powerBR = 0.0;
     private double _encoderFL = 0.0;
     private double _encoderFR = 0.0;
     private double _encoderBL = 0.0;
@@ -165,6 +165,32 @@ public class MecanumDrivebase {
         _powerFR = (driveScale * _powerFR) - _turnRate;
         _powerBL = (driveScale * _powerBL) + _turnRate;
         _powerBR = (driveScale * _powerBR) - _turnRate;
+
+        double scale = Math.max(Math.max(Math.abs(_powerFL), Math.abs(_powerFR)),
+                Math.max(Math.abs(_powerBL), Math.abs(_powerBR)));
+
+        if (scale > 1.0) {
+            _powerFL /= scale;
+            _powerFR /= scale;
+            _powerBL /= scale;
+            _powerBR /= scale;
+        }
+    }
+
+    public void calculatePowerOdometry(double robot_movement_x_component, double robot_movement_y_component, double pivotCorrection) {
+
+        double x = robot_movement_x_component;
+        double y = robot_movement_y_component;
+
+        _magnitude = Math.sqrt((x*x)+(y*y));
+        _theta = Math.atan2(x, y);
+        _turnRate = pivotCorrection;
+
+
+        _powerFL = _magnitude * Math.sin(_theta + quarterPi) + _turnRate;
+        _powerFR = _magnitude * Math.cos(_theta + quarterPi) - _turnRate;
+        _powerBL = _magnitude * Math.cos(_theta + quarterPi) + _turnRate;
+        _powerBR = _magnitude * Math.sin(_theta + quarterPi) - _turnRate;
 
         double scale = Math.max(Math.max(Math.abs(_powerFL), Math.abs(_powerFR)),
                 Math.max(Math.abs(_powerBL), Math.abs(_powerBR)));

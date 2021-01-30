@@ -10,10 +10,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class ArmControls {
 
     public DcMotor arm = null;
-    private double _powerArm = 0.0;
-    private double _encoderArm = 0.0;
-    private double _lowLimit = 50.0;
-    private double _highLimit = 9000.0;
+    public double _powerArm = 0.0;
+    public double _encoderArm = 0.0;
+    private double _lowLimit = 100;
+    private double _highLimit = 2500;
     private double _y = 0.0;
 
     public void initialize(LinearOpMode op) {
@@ -40,9 +40,9 @@ public class ArmControls {
 
         arm.setPower(_powerArm);
 
-        if ((_encoderArm <= _lowLimit) && (_y < 0)) {
+        if ((_encoderArm < _lowLimit) && (_y < 0)) {
             _powerArm = 0.0;
-        } else if ((_encoderArm >= _highLimit) && (_y > 0)) {
+        } else if ((_encoderArm > _highLimit) && (_y > 0)) {
             _powerArm = 0.0;
         } else {
             _powerArm = 1.0 * _y;

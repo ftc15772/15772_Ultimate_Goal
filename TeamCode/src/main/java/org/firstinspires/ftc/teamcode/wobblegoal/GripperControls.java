@@ -10,8 +10,8 @@ public class GripperControls {
 
     public Servo gripper = null;
 
-    private double _gripPosOpen = 0.0;
-    private double _gripPosClose = 0.65;
+    public double _gripPosOpen = 0.0;
+    public double _gripPosClose = 1.0;
     private double _gripPosRing = 0.5;
     private double _gripPosCurrent = _gripPosClose;
     private boolean _flickerKicking = false;
@@ -29,17 +29,17 @@ public class GripperControls {
     }
 
     public void readController (Gamepad gamepad) {
-        if (gamepad.a == true) {
+        if (gamepad.b == true) {
             _gripPosCurrent = _gripPosRing;
         }
         //_a = gamepad.a;
 
-        if (gamepad.right_bumper == true) {
+        if (gamepad.a == true) {
             _gripPosCurrent = _gripPosOpen;
         }
         //_rgtBump = gamepad.right_bumper;
 
-        if (gamepad.left_bumper == true) {
+        if (gamepad.y == true) {
             _gripPosCurrent = _gripPosClose;
         }
         //_lftBump = gamepad.left_bumper;

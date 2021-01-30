@@ -10,7 +10,7 @@ public class BoxTilterControls {
 
     public Servo tilter = null;
 
-    private double _tiltUp = 0.81;
+    private double _tiltUp = 0.84;
     private double _tiltDown = 0.0;
     public boolean _tiltingDown = true;
     private boolean _lftDpad = false;

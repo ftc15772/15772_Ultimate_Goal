@@ -8,9 +8,8 @@ import org.firstinspires.ftc.teamcode.drivebase.MecanumDrivebase;
 import org.firstinspires.ftc.teamcode.intake.ComplicatedSnowplowControls;
 import org.firstinspires.ftc.teamcode.intake.IntakeControls;
 import org.firstinspires.ftc.teamcode.odometry.OdometryControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxSliderControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxTilterControls;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControls;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
 import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
@@ -23,15 +22,14 @@ public class FullRobotTeleop2 extends LinearOpMode {
 
     private MecanumDrivebase mecanumDrivebase = new MecanumDrivebase();
     private GyroSensor gyroSensor = new GyroSensor();
+    private OdometryControls odometryControls = new OdometryControls();
+    private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
     private ArmControls armControls = new ArmControls();
     private IntakeControls intakeControls = new IntakeControls();
     private ComplicatedSnowplowControls plowControls = new ComplicatedSnowplowControls();
     private GripperControls gripperControls = new GripperControls();
-    private BoxFlickerControls flickerControls = new BoxFlickerControls();
-    private OdometryControls odometryControls = new OdometryControls();
-    private BoxSliderControls boxSliderControls = new BoxSliderControls();
-    private BoxTilterControls boxTilterControls = new BoxTilterControls();
-    private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
+    private BoxFlickerEncoderControls flickerControls = new BoxFlickerEncoderControls();
+    private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
     //private TimerControls timer = new TimerControls();
 
     @Override
@@ -39,15 +37,16 @@ public class FullRobotTeleop2 extends LinearOpMode {
 
         mecanumDrivebase.initialize(this);
         gyroSensor.initialize(this);
+        odometryControls.initialize(this);
+        shooterPID1Encoder.initialize(this);
         plowControls.initialize(this);
         armControls.initialize(this);
         intakeControls.initialize(this);
         gripperControls.initialize(this);
         flickerControls.initialize(this);
-        odometryControls.initialize(this);
-        boxSliderControls.initialize(this);
-        boxTilterControls.initialize(this);
-        shooterPID1Encoder.initialize(this);
+        //boxSliderControls.initialize(this);
+        //boxTilterControls.initialize(this);
+        boxSlideTiltControls.initialize(this);
         //timer.initialize(this);
 
         // Wait for the start button
@@ -55,14 +54,14 @@ public class FullRobotTeleop2 extends LinearOpMode {
 
         mecanumDrivebase.startControl();
         gyroSensor.startControl();
+        odometryControls.startControl(telemetry, this);
+        shooterPID1Encoder.startControl();
         gripperControls.startControl();
         flickerControls.startControl();
-        armControls.startControl();
+        //armControls.startControl();
         intakeControls.startControl();
-        odometryControls.startControl();
-        boxSliderControls.startControl();
-        boxTilterControls.startControl();
-        shooterPID1Encoder.startControl();
+        //boxSliderControls.startControl();
+        //boxTilterControls.startControl();
         //timer.startControl();
         //plowControls.startControl();
 
@@ -71,41 +70,44 @@ public class FullRobotTeleop2 extends LinearOpMode {
             _time = getRuntime();
 
             mecanumDrivebase.readController(gamepad1);
+            odometryControls.readController(gamepad1);
             intakeControls.readController(gamepad1);
 
+
+            shooterPID1Encoder.readController(gamepad2);
             armControls.readController(gamepad2);
             plowControls.readController(gamepad2);
             flickerControls.readController(gamepad2);
             gripperControls.readController(gamepad2);
-            boxSliderControls.readController(gamepad2);
-            boxTilterControls.readController(gamepad2);
             flickerControls.readController(gamepad2);
-            shooterPID1Encoder.readController(gamepad2);
+            //boxSliderControls.readController(gamepad2);
+            //boxTilterControls.readController(gamepad2);
+            boxSlideTiltControls.readController(gamepad2);
 
             gyroSensor.updateAngles(this);
 
             mecanumDrivebase.setGyroAngle(gyroSensor.getDirection());
 
             mecanumDrivebase.whileOpModeIsActive(this);
+            odometryControls.whileOpModeIsActive(this);
+            shooterPID1Encoder.whileOpModeIsActive(this);
             intakeControls.whileOpModeIsActive(this);
             armControls.whileOpModeIsActive(this);
             plowControls.whileOpModeIsActive(this, _time);
             //plowControls.whileOpModeIsActive(this);
-            flickerControls.whileOpModeIsActive(this);
+            flickerControls.whileOpModeIsActive(this, _time);
             gripperControls.whileOpModeIsActive(this);
-            odometryControls.whileOpModeIsActive(this);
-            boxSliderControls.whileOpModeIsActive(this, boxTilterControls._tiltingDown);
-            boxTilterControls.whileOpModeIsActive(this, boxSliderControls._sliderIn);
-            flickerControls.whileOpModeIsActive(this);
-            shooterPID1Encoder.whileOpModeIsActive(this);
+            //boxSliderControls.whileOpModeIsActive(this, boxTilterControls._tiltingDown);
+            //boxTilterControls.whileOpModeIsActive(this, boxSliderControls._sliderIn);
+            boxSlideTiltControls.whileOpModeIsActive(this, _time);
 
             //mecanumDrivebase.addTelemetry(telemetry);
+            shooterPID1Encoder.addTelemetry(telemetry);
             //armControls.addTelemetry(telemetry);
             //intakeControls.addTelemetry(telemetry);
             //plowControls.addTelemetry(telemetry);
-            //odometryControls.addTelemetry(telemetry);
             flickerControls.addTelemetry(telemetry);
-            shooterPID1Encoder.addTelemetry(telemetry);
+            odometryControls.addTelemetry(telemetry);
             //timer.addTelemetry(telemetry);
             telemetry.addData("Opmode Timer (ms)", _time);
             telemetry.update();
@@ -113,11 +115,11 @@ public class FullRobotTeleop2 extends LinearOpMode {
         }
 
         mecanumDrivebase.stop();
+        shooterPID1Encoder.stop();
+        odometryControls.stop();
         intakeControls.stop();
         armControls.stop();
-        odometryControls.stop();
         flickerControls.stop();
-        shooterPID1Encoder.stop();
 
     }
 

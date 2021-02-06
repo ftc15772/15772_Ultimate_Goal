@@ -11,13 +11,12 @@ public class GripperControls {
     public Servo gripper = null;
 
     public double _gripPosOpen = 0.0;
-    public double _gripPosClose = 1.0;
+    public double _gripPosClose = 0.67;
     private double _gripPosRing = 0.5;
     private double _gripPosCurrent = _gripPosClose;
-    private boolean _flickerKicking = false;
-    //private boolean _rgtBump = false;
-    //private boolean _lftBump = false;
-    //private boolean _a = false;
+    private boolean _grippingWobbleGoal = true;
+    private boolean _y = false;
+    private boolean _b = false;
 
     public void initialize(LinearOpMode op) {
         gripper = op.hardwareMap.get(Servo.class, "Gripper");
@@ -29,7 +28,19 @@ public class GripperControls {
     }
 
     public void readController (Gamepad gamepad) {
-        if (gamepad.b == true) {
+        if (gamepad.y && !_y) {
+            _grippingWobbleGoal = !_grippingWobbleGoal;
+        }
+        _y = gamepad.y;
+
+        /* if (gamepad.b && !_b) {
+            _gripPosCurrent = _gripPosRing;
+            _grippingWobbleGoal = false;
+        }
+        _b = gamepad.b; */
+
+
+        /* if (gamepad.b == true) {
             _gripPosCurrent = _gripPosRing;
         }
         //_a = gamepad.a;
@@ -42,11 +53,26 @@ public class GripperControls {
         if (gamepad.y == true) {
             _gripPosCurrent = _gripPosClose;
         }
-        //_lftBump = gamepad.left_bumper;
+        //_lftBump = gamepad.left_bumper; */
     }
 
     public void whileOpModeIsActive (LinearOpMode op) {
         this.readController(op.gamepad2);
+
+        /* if ((_grippingWobbleGoal == true) && (_gripPosCurrent != _gripPosRing)) {
+            _gripPosCurrent = _gripPosClose;
+        } else if ((_grippingWobbleGoal == false) && (_gripPosCurrent != _gripPosRing)) {
+            _gripPosCurrent = _gripPosOpen;
+        } else {
+            _gripPosCurrent = _gripPosRing;
+        }*/
+
+        if (_grippingWobbleGoal == true) {
+            _gripPosCurrent = _gripPosClose;
+        } else if (_grippingWobbleGoal == false) {
+            _gripPosCurrent = _gripPosOpen;
+        }
+
         gripper.setPosition(_gripPosCurrent);
     }
 

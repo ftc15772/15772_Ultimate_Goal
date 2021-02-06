@@ -3,12 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.drivebase.GyroSensor;
 import org.firstinspires.ftc.teamcode.drivebase.MecanumDrivebase;
 import org.firstinspires.ftc.teamcode.intake.ComplicatedSnowplowControls;
 import org.firstinspires.ftc.teamcode.intake.IntakeControls;
-import org.firstinspires.ftc.teamcode.odometry.OdometryControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControls;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControlsNew;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
 import org.firstinspires.ftc.teamcode.shooter.DeflectorControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
@@ -16,18 +14,17 @@ import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
 
 
-//Testing Sourcetree 1/30/21
-@TeleOp(name = "Full Robot Teleop", group = "Linear Opmode")
+@TeleOp(name = "Full Robot Teleop (NEW)", group = "Linear Opmode")
 //@Disabled
-public class FullRobotTeleop2 extends LinearOpMode {
+public class FullRobotTeleop3 extends LinearOpMode {
 
     double _time = 0.0;
 
     private MecanumDrivebase mecanumDrivebase = new MecanumDrivebase();
-    private GyroSensor gyroSensor = new GyroSensor();
-    private OdometryControls odometryControls = new OdometryControls();
+    //private GyroSensor gyroSensor = new GyroSensor();
+    //private OdometryControls odometryControls = new OdometryControls();
     private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
-    private BoxFlickerEncoderControls flickerControls = new BoxFlickerEncoderControls();
+    private BoxFlickerEncoderControlsNew flickerControls = new BoxFlickerEncoderControlsNew();
     private ArmControls armControls = new ArmControls();
     private IntakeControls intakeControls = new IntakeControls();
     private ComplicatedSnowplowControls plowControls = new ComplicatedSnowplowControls();
@@ -40,8 +37,8 @@ public class FullRobotTeleop2 extends LinearOpMode {
     public void runOpMode() {
 
         mecanumDrivebase.initialize(this);
-        gyroSensor.initialize(this);
-        odometryControls.initialize(this);
+        //gyroSensor.initialize(this);
+        //odometryControls.initialize(this);
         shooterPID1Encoder.initialize(this);
         flickerControls.initialize(this);
         plowControls.initialize(this);
@@ -58,8 +55,8 @@ public class FullRobotTeleop2 extends LinearOpMode {
         waitForStart();
 
         mecanumDrivebase.startControl();
-        gyroSensor.startControl();
-        odometryControls.startControl(telemetry, this);
+        //gyroSensor.startControl();
+        //odometryControls.startControl(telemetry, this);
         shooterPID1Encoder.startControl();
         flickerControls.startControl();
         gripperControls.startControl();
@@ -75,47 +72,48 @@ public class FullRobotTeleop2 extends LinearOpMode {
             _time = getRuntime();
 
             mecanumDrivebase.readController(gamepad1);
-            odometryControls.readController(gamepad1);
+            //odometryControls.readController(gamepad1);
             intakeControls.readController(gamepad1);
 
 
             shooterPID1Encoder.readController(gamepad2);
             flickerControls.readController(gamepad2);
+            boxSlideTiltControls.readController(gamepad2);
             armControls.readController(gamepad2);
             plowControls.readController(gamepad2);
             gripperControls.readController(gamepad2);
-            boxSlideTiltControls.readController(gamepad2);
             deflectorControls.readController(gamepad2);
             //boxSliderControls.readController(gamepad2);
             //boxTilterControls.readController(gamepad2);
 
-            gyroSensor.updateAngles(this);
+            //gyroSensor.updateAngles(this);
 
-            mecanumDrivebase.setGyroAngle(gyroSensor.getDirection());
+            //mecanumDrivebase.setGyroAngle(gyroSensor.getDirection());
 
             mecanumDrivebase.whileOpModeIsActive(this);
-            odometryControls.whileOpModeIsActive(this);
+            //odometryControls.whileOpModeIsActive(this);
             shooterPID1Encoder.whileOpModeIsActive(this);
             flickerControls.whileOpModeIsActive(this, _time);
+            boxSlideTiltControls.whileOpModeIsActive(this, _time);
             intakeControls.whileOpModeIsActive(this);
             armControls.whileOpModeIsActive(this);
             plowControls.whileOpModeIsActive(this, _time);
             gripperControls.whileOpModeIsActive(this);
-            boxSlideTiltControls.whileOpModeIsActive(this, _time);
             deflectorControls.whileOpModeIsActive(this);
             //plowControls.whileOpModeIsActive(this);
             //boxSliderControls.whileOpModeIsActive(this, boxTilterControls._tiltingDown);
             //boxTilterControls.whileOpModeIsActive(this, boxSliderControls._sliderIn);
 
             //mecanumDrivebase.addTelemetry(telemetry);
+            shooterPID1Encoder.addTelemetry(telemetry);
             flickerControls.addTelemetry(telemetry);
             deflectorControls.addTelemetry(telemetry);
-            shooterPID1Encoder.addTelemetry(telemetry);
             //armControls.addTelemetry(telemetry);
             //intakeControls.addTelemetry(telemetry);
             //plowControls.addTelemetry(telemetry);
             //odometryControls.addTelemetry(telemetry);
             //timer.addTelemetry(telemetry);
+
             telemetry.addData("Opmode Timer (ms)", _time);
             telemetry.update();
             idle();
@@ -123,10 +121,10 @@ public class FullRobotTeleop2 extends LinearOpMode {
 
         mecanumDrivebase.stop();
         shooterPID1Encoder.stop();
-        odometryControls.stop();
+        //odometryControls.stop();
+        flickerControls.stop();
         intakeControls.stop();
         armControls.stop();
-        flickerControls.stop();
 
     }
 

@@ -106,7 +106,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
 
             //mecanumDrivebase.addTelemetry(telemetry);
             shooterPID1Encoder.addTelemetry(telemetry);
-            flickerControls.addTelemetry(telemetry);
+            flickerControls.addTelemetry(telemetry, _time);
             deflectorControls.addTelemetry(telemetry);
             //armControls.addTelemetry(telemetry);
             //intakeControls.addTelemetry(telemetry);

@@ -12,8 +12,8 @@ public class DeflectorControls {
 
     private double _lowestPos = 1.0;
     private double _highestPos = 0.0;
-    private double _highGoalPos= 0.3;
-    private double _servoPos = _highGoalPos;
+    private double _highGoalPos= 0.35;
+    private double _servoPos;
     private boolean _a = false;
     private boolean _start = false;
     private boolean _back = false;
@@ -24,6 +24,7 @@ public class DeflectorControls {
 
     public void initialize(LinearOpMode op) {
         deflector = op.hardwareMap.get(Servo.class, "Deflector");
+        _servoPos = _highGoalPos;
         deflector.setPosition(_servoPos);
     }
 
@@ -34,10 +35,30 @@ public class DeflectorControls {
     public void readController (Gamepad gamepad) {
         if (gamepad.a && !_a) {
             _servoPos = _highGoalPos;
+
+            /* if (_currentPosition == 2) {
+                _servoPos = _lowestPos;
+                _currentPosition = 1;
+            } else if (_currentPosition == 1) {
+                _servoPos = _highestPos;
+                _currentPosition = 3;
+            } else if (_currentPosition == 3) {
+                _servoPos = _highGoalPos;
+                _currentPosition = 2;
+            } */
+
         } else if (gamepad.start && !_start) {
-            _servoPos -= 0.05;
+            if (_servoPos > _highestPos) {
+                _servoPos = deflector.getPosition() - 0.05;
+            } else {
+                _servoPos = _servoPos;
+            }
         } else if (gamepad.back && !_back) {
-            _servoPos += 0.05;
+            if (_servoPos < _lowestPos) {
+                _servoPos = deflector.getPosition() + 0.05;
+            } else {
+                _servoPos = _servoPos;
+            }
         }
         _a = gamepad.a;
         _start = gamepad.start;
@@ -50,7 +71,8 @@ public class DeflectorControls {
     }
 
     public void addTelemetry (Telemetry telemetry) {
-        telemetry.addData("Deflector Position", deflector.getPosition());
+        telemetry.addData("Deflector Actual Position", deflector.getPosition());
+        telemetry.addData("Deflector Target Position", _servoPos);
     }
 
     public void stop () {

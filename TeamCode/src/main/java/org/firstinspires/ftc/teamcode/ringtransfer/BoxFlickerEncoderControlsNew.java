@@ -25,12 +25,15 @@ public class BoxFlickerEncoderControlsNew {
     private boolean _changeTimesShot = false;
     boolean _timeCheck = false;
     double _lastTime = 0.0;
+    double _lastUpdateTime = 0.0;
+    double _currentTime = 0.0;
+    double _deltaTime;
 
     public void initialize(LinearOpMode op) {
         flicker = op.hardwareMap.get(CRServo.class, "ShooterFlick");
         flickEncoder = op.hardwareMap.get(DcMotor.class, "Intake");
         flickEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        flickEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flickEncoder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         flicker.setPower(0.0);
     }
 
@@ -69,7 +72,7 @@ public class BoxFlickerEncoderControlsNew {
 
 
             // if (_currentEncoderValue > (_timesShots3Rings * (3*_oneRing))) {
-            if (_currentEncoderValue > (3*_oneRing)) {
+            if ((_currentEncoderValue - _lastEncoderValue) > (3*_oneRing)) {
                 flicker.setPower(-1.0); /*
             } else if ((_currentEncoderValue > (_timesShots3Rings * (4.5*_oneRing))) && (_currentEncoderValue < (_timesShots3Rings * (3*_oneRing)))) {
                 flicker.setPower(-0.3); */
@@ -108,8 +111,6 @@ public class BoxFlickerEncoderControlsNew {
 
         } else {
             flicker.setPower(0.0);
-            flickEncoder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            flickEncoder.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             _changeTimesShot = false;
             _lastEncoderValue = _currentEncoderValue;
             _flickerKicking = false;
@@ -123,9 +124,17 @@ public class BoxFlickerEncoderControlsNew {
         }
     }
 
-    public void addTelemetry (Telemetry telemetry) {
+    public void addTelemetry (Telemetry telemetry, double time) {
         telemetry.addData("Flicker Kicking", _flickerKicking);
         telemetry.addData("Flicker Encoder Value", _currentEncoderValue);
+
+        _currentTime = time*1000;
+        if (_currentTime != _lastUpdateTime) {
+            _deltaTime = _currentTime - _lastUpdateTime;
+            _lastUpdateTime = _currentTime;
+        }
+        telemetry.addData("Delta Time", _deltaTime);
+
     }
 
     public void stop () {

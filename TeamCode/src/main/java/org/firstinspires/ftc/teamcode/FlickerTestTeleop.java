@@ -33,7 +33,7 @@ public class FlickerTestTeleop extends LinearOpMode {
             flickerControls.whileOpModeIsActive(this, _time);
 
 
-            flickerControls.addTelemetry(telemetry);
+            flickerControls.addTelemetry(telemetry, _time);
             telemetry.addData("Opmode Timer (ms)", _time);
             telemetry.update();
             idle();

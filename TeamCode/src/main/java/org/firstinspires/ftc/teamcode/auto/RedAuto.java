@@ -35,6 +35,7 @@ public class RedAuto extends LinearOpMode {
     ElapsedTime Timer;
     double _time = 0.0;
     double _lastTime = 0.0;
+    boolean _facingReverse = false;
     String _ringType = "notDetected"; //"notDetected" to start, then none = "none", one is "one", and four is "four"
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
@@ -172,8 +173,26 @@ public class RedAuto extends LinearOpMode {
         }
         parallelActionsControls.stop(this, Timer.milliseconds());
 
-        goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 80*COUNTS_PER_INCH, 0.3, 0, 1.5*COUNTS_PER_INCH);
+        goToPosition("resetBox", 90*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.5, 0, 3*COUNTS_PER_INCH);
+        //_facingReverse = true;
+        goToPosition("none", 68*COUNTS_PER_INCH, 40*COUNTS_PER_INCH, 0.6, 0, 4*COUNTS_PER_INCH);
+        goToPosition("grabWobble", 68*COUNTS_PER_INCH, 16*COUNTS_PER_INCH, 0.6, 0, 3*COUNTS_PER_INCH);
+        turnInPlace("none", 0.6, 90,10);
+        goToPosition("grabWobble", 68*COUNTS_PER_INCH, 16*COUNTS_PER_INCH, 0.4, 90, 3*COUNTS_PER_INCH);
+        goToPosition("none", 79*COUNTS_PER_INCH, 16*COUNTS_PER_INCH, 0.45, 90, 2.5*COUNTS_PER_INCH);
+        //turnInPlace("none", 0.6, 180,10);
+        //goToPosition("grabWobble", 93.5*COUNTS_PER_INCH, 37*COUNTS_PER_INCH, 0.6, 175, 3*COUNTS_PER_INCH);
+        right_front.setPower(0);
+        right_back.setPower(0);
+        left_front.setPower(0);
+        left_back.setPower(0);
+        parallelActionsControls._state = "gripWobble";
+        parallelActionsControls.wobbleGoal();
+        sleep(300);
 
+
+        /*
+        goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 80*COUNTS_PER_INCH, 0.3, 0, 1.5*COUNTS_PER_INCH);
 
         right_front.setPower(0);
         right_back.setPower(0);
@@ -184,9 +203,10 @@ public class RedAuto extends LinearOpMode {
         _lastTime = _time = Timer.milliseconds();
         while (parallelActionsControls._state == "resetBox") {
             _time = Timer.milliseconds();
-            parallelActionsControls.resetBox(_time, _lastTime);
+            parallelActionsControls.resetBox(this, Timer.milliseconds());
         }
         sleep(1000);
+         */
 
 
 
@@ -260,6 +280,59 @@ public class RedAuto extends LinearOpMode {
                 _powerBR /= scale;
             }
 
+            if (_facingReverse == false) {
+                left_front.setPower(-_powerFL);
+                right_front.setPower(_powerFR);
+                left_back.setPower(-_powerBL);
+                right_back.setPower(-_powerBR);
+            } else if (_facingReverse == true) {
+                left_front.setPower(_powerFL);
+                right_front.setPower(_powerFR);
+                left_back.setPower(-_powerBL);
+                right_back.setPower(_powerBR);
+            }
+
+            _time = Timer.milliseconds();
+            parallelActionsControls._state = state;
+            parallelActionsControls.wobbleGoal();
+            parallelActionsControls.shooterComponents(this, _time, telemetry);
+            parallelActionsControls.resetBox(this, _time);
+
+            //Display Global (x, y, theta) coordinates
+            telemetry.addData("Ring Type", _ringType);
+            telemetry.addData("X Position", _xFromPermanentPoint);
+            telemetry.addData("Y Position", _yFromPermanentPoint);
+            telemetry.addData("Orientation (Degrees)", globalPositionUpdate.returnOrientation());
+            telemetry.update();
+        }
+    }
+
+    public void turnInPlace(String state, double robotPower, double desiredRobotOrientation, double allowableAngleError){
+
+        double pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+
+        while (opModeIsActive() && (Math.abs(pivotCorrection) > allowableAngleError)){
+
+            pivotCorrection = desiredRobotOrientation - globalPositionUpdate.returnOrientation();
+
+            double _turnRate = Math.toRadians(pivotCorrection) * robotPower;
+
+            double _powerFL = _turnRate;
+            double _powerFR = -_turnRate;
+            double _powerBL = _turnRate;
+            double _powerBR = -_turnRate;
+
+
+            double scale = Math.max(Math.max(Math.abs(_powerFL), Math.abs(_powerFR)),
+                    Math.max(Math.abs(_powerBL), Math.abs(_powerBR)));
+
+            if (scale > 1.0) {
+                _powerFL /= scale;
+                _powerFR /= scale;
+                _powerBL /= scale;
+                _powerBR /= scale;
+            }
+
             left_front.setPower(-_powerFL);
             right_front.setPower(_powerFR);
             left_back.setPower(-_powerBL);
@@ -269,6 +342,7 @@ public class RedAuto extends LinearOpMode {
             parallelActionsControls._state = state;
             parallelActionsControls.wobbleGoal();
             parallelActionsControls.shooterComponents(this, _time, telemetry);
+            parallelActionsControls.resetBox(this, _time);
 
             //Display Global (x, y, theta) coordinates
             telemetry.addData("Ring Type", _ringType);

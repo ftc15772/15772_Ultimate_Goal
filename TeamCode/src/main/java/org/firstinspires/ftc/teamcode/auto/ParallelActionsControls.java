@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
+import org.firstinspires.ftc.teamcode.shooter.DeflectorControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
 import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
@@ -18,6 +19,7 @@ public class ParallelActionsControls {
     private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
     private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
     private BoxFlickerEncoderControls boxFlickerEncoderControls = new BoxFlickerEncoderControls();
+    private DeflectorControls deflectorControls = new DeflectorControls();
     // variables below
     public String _state = "none";
     double _lastTime = 0;
@@ -28,14 +30,12 @@ public class ParallelActionsControls {
         shooterPID1Encoder.initialize(op);
         boxSlideTiltControls.initialize(op);
         boxFlickerEncoderControls.initialize(op);
+        deflectorControls.initialize(op);
+        deflectorControls.deflector.setPosition(0.45);
     }
 
     public void startControl() {
         shooterPID1Encoder.startControl();
-    }
-
-    public void whileOpModeIsActive (LinearOpMode op) {
-
     }
 
     public void shooterComponents(LinearOpMode op, double time, Telemetry telemetry) {
@@ -46,7 +46,7 @@ public class ParallelActionsControls {
             shooterPID1Encoder.shooterAuto(op, 2400, _time);
 
             boxSlideTiltControls._currentBoxInShooterPos = true;
-            boxSlideTiltControls.whileOpModeIsActive(op, _time);
+            boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
         } else if (_state == "shoot3Rings") {
             shooterPID1Encoder._targetRPM = 2400;
             shooterPID1Encoder.shooterAuto(op, 2400, _time);
@@ -63,11 +63,21 @@ public class ParallelActionsControls {
         }
     }
 
-    public void resetBox(double currentTime, double lastTime) {
+    public void resetBox(LinearOpMode op, double time){ //double currentTime, double lastTime) {
         if (_state == "resetBox") {
-            armControls.arm.setPower(0);
+
+            /* armControls.arm.setPower(0);
             boxSlideTiltControls._lastBoxInShooterPos = true;
             boxSlideTiltControls.autoBoxIntakePos(currentTime, lastTime);
+            if (boxSlideTiltControls._lastBoxInShooterPos == false) {
+                _state = "none";
+            } */
+
+            double _time = time;
+            armControls.arm.setPower(0);
+            boxSlideTiltControls._currentBoxInShooterPos = false;
+            boxSlideTiltControls._lastBoxInShooterPos = true;
+            boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
             if (boxSlideTiltControls._lastBoxInShooterPos == false) {
                 _state = "none";
             }
@@ -80,19 +90,29 @@ public class ParallelActionsControls {
             armControls.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armControls._encoderArm = armControls.arm.getCurrentPosition();
 
-            if (armControls._encoderArm < 3700) {
+            if (armControls._encoderArm < 3500) {
                 armControls._powerArm = 1.0;
             } else {
                 armControls._powerArm = 0.0;
                 _state = "none";
             }
 
-        } else if (_state == "raiseWobble") {
+        } else if ((_state == "raiseWobble") || (_state == "prepareShooter")) {
             armControls.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armControls._encoderArm = armControls.arm.getCurrentPosition();
 
-            if (armControls._encoderArm > 2000) {
-                armControls._powerArm = -0.5;
+            if (armControls._encoderArm > 1800) {
+                armControls._powerArm = -1.0;
+            } else {
+                armControls._powerArm = 0.0;
+            }
+
+        } else if (_state == "grabWobble") {
+            armControls.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            armControls._encoderArm = armControls.arm.getCurrentPosition();
+
+            if (armControls._encoderArm < 4200) {
+                armControls._powerArm = 1.0;
             } else {
                 armControls._powerArm = 0.0;
                 _state = "none";
@@ -107,6 +127,10 @@ public class ParallelActionsControls {
         // ungrip wobble goal
         if (_state == "ungripWobble") {
             gripperControls.gripper.setPosition(gripperControls._gripPosOpen);
+        }
+
+        if (_state == "gripWobble") {
+            gripperControls.gripper.setPosition(gripperControls._gripPosClose);
         }
     }
 

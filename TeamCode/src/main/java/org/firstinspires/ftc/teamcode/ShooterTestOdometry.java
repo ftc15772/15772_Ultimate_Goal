@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,12 +11,13 @@ import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.teamcode.auto.ParallelActionsControls;
 import org.firstinspires.ftc.teamcode.odometry.OdometryGlobalCoordinatePosition;
 
 import java.util.List;
 
-@Autonomous(name = "Red Auto")
-public class RedAuto extends LinearOpMode {
+@Autonomous(name = "Auto - Shooter & Odometry")
+public class ShooterTestOdometry extends LinearOpMode {
 
     private ParallelActionsControls parallelActionsControls = new ParallelActionsControls();
 
@@ -27,21 +28,21 @@ public class RedAuto extends LinearOpMode {
 
     final double COUNTS_PER_INCH = (8192/5.93687);
 
-    double _permanentX = 116.25; //inches
-    double _permanentY = 9; //inches
+    double _permanentX = 10; //inches
+    double _permanentY = 10; //inches
     double _xFromPermanentPoint;
     double _yFromPermanentPoint;
     //public String _state = "none";
     ElapsedTime Timer;
     double _time = 0.0;
-    double _lastTime = 0.0;
+    //double _lastTime = 0.0;
     boolean _facingReverse = false;
     String _ringType = "notDetected"; //"notDetected" to start, then none = "none", one is "one", and four is "four"
     private static final String TFOD_MODEL_ASSET = "UltimateGoal.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Quad";
     private static final String LABEL_SECOND_ELEMENT = "Single";
 
-            //Hardware Map Names for drive motors and odometry wheels. THIS WILL CHANGE ON EACH ROBOT, YOU NEED TO UPDATE THESE VALUES ACCORDINGLY
+    //Hardware Map Names for drive motors and odometry wheels. THIS WILL CHANGE ON EACH ROBOT, YOU NEED TO UPDATE THESE VALUES ACCORDINGLY
     String rfName = "FR", rbName = "BR", lfName = "FL", lbName = "BL";
     String verticalLeftEncoderName = "FL", verticalRightEncoderName = "BL", horizontalEncoderName = "BR";
     OdometryGlobalCoordinatePosition globalPositionUpdate;
@@ -100,69 +101,19 @@ public class RedAuto extends LinearOpMode {
                     _ringType = "one";
                 } else if (recognition.getLabel() == "Quad") {
                     _ringType = "four";
-                }
-            }
-        }
-
-        if (_ringType == "notDetected") {
-            goToPosition("none", 106*COUNTS_PER_INCH,15*COUNTS_PER_INCH,0.4,0, 3*COUNTS_PER_INCH);
-            right_front.setPower(0);
-            right_back.setPower(0);
-            left_front.setPower(0);
-            left_back.setPower(0);
-            while (_ringType == "notDetected") {
-                _time = Timer.milliseconds();
-                updatedRecognitions = tfod.getUpdatedRecognitions();
-                if (updatedRecognitions != null) {
-                    telemetry.addData("# Object Detected", updatedRecognitions.size());
-                    int i = 0;
-                    for (Recognition recognition : updatedRecognitions) {
-                        telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
-                        if (recognition.getLabel() == "Single") {
-                            _ringType = "one";
-                        } else if (recognition.getLabel() == "Quad") {
-                            _ringType = "four";
-                        }
-                    }
-                }
-                if ((_time > 5000) && (_ringType == "notDetected")) {
+                } else {
                     _ringType = "none";
                 }
             }
         }
 
-        goToPosition("placeWobble", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.6, 0, 2*COUNTS_PER_INCH);
-
-
-        if (_ringType == "four") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.7, 0, 2.5*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 121*COUNTS_PER_INCH, 115*COUNTS_PER_INCH, 0.5, 45, 4*COUNTS_PER_INCH);
-        } else if (_ringType == "one") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.7, 0, 4*COUNTS_PER_INCH);
-            //goToPosition("placeWobble", 98*COUNTS_PER_INCH, 89*COUNTS_PER_INCH, 0.5, 45, 3*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 107*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.5, 0, 2.5*COUNTS_PER_INCH);
-        } else { //if (_ringType == "none") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.4, 25, 4*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 124*COUNTS_PER_INCH, 67*COUNTS_PER_INCH, 0.4, 45, 2.5*COUNTS_PER_INCH);
+        goToPosition("none", 10*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.4, 0, 3*COUNTS_PER_INCH);
+        if ((_ringType == "one") || (_ringType == "four")) {
+            goToPosition("prepareShooter", 30*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.4, 0, 3*COUNTS_PER_INCH);
+        } else {
+            goToPosition("prepareShooter", 30*COUNTS_PER_INCH, 40*COUNTS_PER_INCH, 0.4, 0, 3*COUNTS_PER_INCH);
         }
-        right_front.setPower(0);
-        right_back.setPower(0);
-        left_front.setPower(0);
-        left_back.setPower(0);
-        parallelActionsControls._state = "ungripWobble";
-        parallelActionsControls.wobbleGoal();
-        sleep(300);
-
-        parallelActionsControls.shooterPID1Encoder._manualPowerSet = true;
-        if (_ringType == "four") {
-            goToPosition("prepareShooter", 112*COUNTS_PER_INCH, 106*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
-        } else if (_ringType == "one") {
-            goToPosition("prepareShooter", 107*COUNTS_PER_INCH, 85*COUNTS_PER_INCH, 0.4, 0, 2*COUNTS_PER_INCH);
-        } else { //if (_ringType == "none") {
-            goToPosition("prepareShooter", 120*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.3, 45, 2*COUNTS_PER_INCH);
-        }
-        goToPosition("prepareShooter", 105*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.4, 8, 2*COUNTS_PER_INCH);
-
+        goToPosition("prepareShooter", 30*COUNTS_PER_INCH, 10*COUNTS_PER_INCH, 0.4, 0, 3*COUNTS_PER_INCH);
 
         right_front.setPower(0);
         right_back.setPower(0);
@@ -177,58 +128,6 @@ public class RedAuto extends LinearOpMode {
         }
         parallelActionsControls.shooterPID1Encoder.stop();
         parallelActionsControls.stop();
-
-
-        goToPosition("resetBox", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.6, 0, 4*COUNTS_PER_INCH);
-        goToPosition("grabWobble", 123*COUNTS_PER_INCH, 45*COUNTS_PER_INCH, 0.6, -10, 5*COUNTS_PER_INCH);
-        goToPosition("grabWobble", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.6, -25, 6*COUNTS_PER_INCH);
-        goToPosition("grabWobble", 123*COUNTS_PER_INCH, 14*COUNTS_PER_INCH, 0.5, -25, 5*COUNTS_PER_INCH);
-        goToPosition("grabWobble", 108.5*COUNTS_PER_INCH, 17*COUNTS_PER_INCH, 0.4, -40, 4*COUNTS_PER_INCH);
-        right_front.setPower(0);
-        right_back.setPower(0);
-        left_front.setPower(0);
-        left_back.setPower(0);
-        parallelActionsControls._state = "gripWobble";
-        parallelActionsControls.wobbleGoal();
-        sleep(300);
-        goToPosition("raiseWobble", 123*COUNTS_PER_INCH, 30*COUNTS_PER_INCH, 0.5, 0, 2*COUNTS_PER_INCH);
-
-        if (_ringType == "four") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 93*COUNTS_PER_INCH, 0.7, 0, 2.5*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 121*COUNTS_PER_INCH, 115*COUNTS_PER_INCH, 0.5, 45, 4*COUNTS_PER_INCH);
-        } else if (_ringType == "one") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.7, 0, 4*COUNTS_PER_INCH);
-            //goToPosition("placeWobble", 98*COUNTS_PER_INCH, 89*COUNTS_PER_INCH, 0.5, 45, 3*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 117*COUNTS_PER_INCH, 88*COUNTS_PER_INCH, 0.5, 0, 2.5*COUNTS_PER_INCH);
-        } else if (_ringType == "none") {
-            goToPosition("placeWobble", 123*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.4, 25, 4*COUNTS_PER_INCH);
-            goToPosition("placeWobble", 124*COUNTS_PER_INCH, 67*COUNTS_PER_INCH, 0.4, 45, 2.5*COUNTS_PER_INCH);
-        }
-        right_front.setPower(0);
-        right_back.setPower(0);
-        left_front.setPower(0);
-        left_back.setPower(0);
-        parallelActionsControls._state = "ungripWobble";
-        parallelActionsControls.wobbleGoal();
-        sleep(300);
-
-        if (_ringType == "four") {
-            goToPosition("raiseWobble", 112*COUNTS_PER_INCH, 106*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
-        } else if (_ringType == "one") {
-            goToPosition("raiseWobble", 117*COUNTS_PER_INCH, 85*COUNTS_PER_INCH, 0.4, 0, 2*COUNTS_PER_INCH);
-        } else if (_ringType == "none") {
-            goToPosition("raiseWobble", 120*COUNTS_PER_INCH, 63*COUNTS_PER_INCH, 0.4, 45, 3*COUNTS_PER_INCH);
-            goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.6, 0, 4*COUNTS_PER_INCH);
-        }
-
-        goToPosition("raiseWobble", 105*COUNTS_PER_INCH, 80*COUNTS_PER_INCH, 0.5, 0, 3*COUNTS_PER_INCH);
-        right_front.setPower(0);
-        right_back.setPower(0);
-        left_front.setPower(0);
-        left_back.setPower(0);
-
-
-
 
         /*
         goToPosition("resetBox", 90*COUNTS_PER_INCH, 65*COUNTS_PER_INCH, 0.5, 0, 3*COUNTS_PER_INCH);

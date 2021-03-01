@@ -59,7 +59,7 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
         goToPosition("raiseWobble", 24*COUNTS_PER_INCH, 8*COUNTS_PER_INCH, 0.35, 0, 1.5*COUNTS_PER_INCH);
 
 
-        parallelActionsControls.stop(this, _time);
+        parallelActionsControls.stop();
         right_front.setPower(0);
         right_back.setPower(0);
         left_front.setPower(0);
@@ -79,7 +79,7 @@ public class MyOdometryVectorMecanum extends LinearOpMode {
             telemetry.update();
         }
 
-        parallelActionsControls.stop(this, _time);
+        parallelActionsControls.stop();
         //Stop the thread
         globalPositionUpdate.stop();
 

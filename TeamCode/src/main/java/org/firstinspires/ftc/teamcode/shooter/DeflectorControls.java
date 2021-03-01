@@ -12,7 +12,9 @@ public class DeflectorControls {
 
     private double _lowestPos = 1.0;
     private double _highestPos = 0.0;
-    private double _highGoalPos= 0.35;
+    public double _highGoalPos = 0.3;
+    public double _highGoalPosAuto = 0.35;
+    public double _powerShotPos = 0.6;
     private double _servoPos;
     private boolean _a = false;
     private boolean _start = false;

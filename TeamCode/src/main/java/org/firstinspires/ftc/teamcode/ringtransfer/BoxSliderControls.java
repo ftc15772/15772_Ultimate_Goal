@@ -10,7 +10,7 @@ public class BoxSliderControls {
 
     public Servo slider = null;
 
-    private double _slideOut = 0.25;
+    private double _slideOut = 0.27;
     private double _slideIn = 1.0;
     public boolean _sliderIn = true;
     private boolean _b = false;

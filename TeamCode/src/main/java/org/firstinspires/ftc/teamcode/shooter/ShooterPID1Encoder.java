@@ -16,6 +16,11 @@ public class ShooterPID1Encoder {
     public DcMotorEx _primaryMotor = null;
     public DcMotorEx _secondaryMotor = null;
 
+    public double currentTime;
+    public double _deltaTime;
+    double _powerNotClipped;
+    public boolean _manualPowerSet = false;
+    int _countManual = 0;
     public double _lastTime = _runtime.milliseconds();
     public double _lastTicks = 0.0;
     public double _lastError = 0.0;
@@ -128,26 +133,39 @@ public class ShooterPID1Encoder {
         _lastError = _error;
     }
 
+    public void shooterAuto2 (LinearOpMode op, double targetRPM) {
+        double newRPM = targetRPM;
+        this.setByRPM(newRPM);
+        whileOpModeIsActive(op);
+    }
 
     public void whileOpModeIsActive (LinearOpMode op) {
-        this.readController(op.gamepad2);
-        double currentTime = _runtime.seconds();
-        double deltaTime = currentTime - _lastTime;
-        if (deltaTime < 0.1) {
+        currentTime = _runtime.seconds();
+        _deltaTime = currentTime - _lastTime;
+        if (_deltaTime < 0.1) {
             return;
         }
         double currentTicks = _primaryMotor.getCurrentPosition();
         double deltaTicks = currentTicks - _lastTicks;
-        _measuredTicksPerSecond = deltaTicks / deltaTime;
+        _measuredTicksPerSecond = deltaTicks / _deltaTime;
         _measuredRPM = TICKS_PER_SECOND_TO_RPM(_measuredTicksPerSecond);
 
         _error = _targetTicksPerSecond - _measuredTicksPerSecond;
         double deltaError = _error - _lastError;
-        _Derivative = deltaError / deltaTime;
-        _Integral += (_error * deltaTime);
+        _Derivative = deltaError / _deltaTime;
 
-        _currentPower = (_P * _error + _I * _Integral + _D * _Derivative) / MAX_TICKS_PER_SECOND;
-        _currentPower = Range.clip(_currentPower, 0.0, 1.0);
+        if (_manualPowerSet == false) {
+            _Integral += (_error * _deltaTime); // Different in red auto vs teleop / shooter test auto
+        } else {
+            _Integral = 2200;
+            _countManual += 1;
+            if (_countManual >= 7) {
+                _manualPowerSet = false;
+            }
+        }
+
+        _powerNotClipped = (_P * _error + _I * _Integral + _D * _Derivative) / MAX_TICKS_PER_SECOND;
+        _currentPower = Range.clip(_powerNotClipped, 0.0, 1.0);
 
         if (_targetTicksPerSecond <= 0) {
             _primaryMotor.setPower(0.0);
@@ -172,7 +190,7 @@ public class ShooterPID1Encoder {
 
         if (!_dpadUp && gamepad.dpad_up) {
             //newRPM = Range.clip(newRPM + RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
-            newRPM = 3800.0;
+            newRPM = 3600.0;
             this.setByRPM(newRPM);
         } else if (!_dpadDown && gamepad.dpad_down) {
             //newRPM = Range.clip(newRPM - RPM_INCREMENT, MIN_RPM, RPM_LIMIT);
@@ -187,6 +205,11 @@ public class ShooterPID1Encoder {
     }
 
     public void addTelemetry (Telemetry telemetry) {
+        telemetry.addData("Power Not Clipped", _powerNotClipped);
+        telemetry.addData("Integral", _Integral); // For 3000 RPM -> Around 2500 for teleop and ShooterTestOdometry; over 6500 for Red Auto
+        telemetry.addData("Error x Delta Time", _error * _deltaTime);
+        telemetry.addData("Error", _error);
+        telemetry.addData("Delta Time", _deltaTime);
         telemetry.addData("Target RPM", "%.03f rpm", _targetRPM);
         telemetry.addData("Measured RPM", "%.03f rpm", _measuredRPM);
         telemetry.addData("Target TPS", "%.03f tps", _targetTicksPerSecond);

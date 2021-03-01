@@ -16,13 +16,13 @@ public class ParallelActionsControls {
 
     private ArmControls armControls = new ArmControls();
     private GripperControls gripperControls = new GripperControls();
-    private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
+    public ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
     private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
     private BoxFlickerEncoderControls boxFlickerEncoderControls = new BoxFlickerEncoderControls();
     private DeflectorControls deflectorControls = new DeflectorControls();
     // variables below
     public String _state = "none";
-    double _lastTime = 0;
+    public double _lastTime;
 
     public void initialize(LinearOpMode op) {
         armControls.initialize(op);
@@ -31,7 +31,7 @@ public class ParallelActionsControls {
         boxSlideTiltControls.initialize(op);
         boxFlickerEncoderControls.initialize(op);
         deflectorControls.initialize(op);
-        deflectorControls.deflector.setPosition(0.45);
+        deflectorControls.deflector.setPosition(deflectorControls._highGoalPosAuto);
     }
 
     public void startControl() {
@@ -42,22 +42,19 @@ public class ParallelActionsControls {
         double _time = time;
         //spin up shooter and get box ready to shoot
         if (_state == "prepareShooter") {
-            shooterPID1Encoder._targetRPM = 2400;
-            shooterPID1Encoder.shooterAuto(op, 2400, _time);
+            shooterPID1Encoder.shooterAuto2(op, 3600);
+            shooterPID1Encoder.addTelemetry(telemetry);
 
             boxSlideTiltControls._currentBoxInShooterPos = true;
             boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
         } else if (_state == "shoot3Rings") {
-            shooterPID1Encoder._targetRPM = 2400;
-            shooterPID1Encoder.shooterAuto(op, 2400, _time);
+            shooterPID1Encoder.shooterAuto2(op, 3600);
             boxFlickerEncoderControls.flicker.setPower(-1.0);
             shooterPID1Encoder.addTelemetry(telemetry);
-            op.sleep(1000);
-            _state = "none";
+            if ((_time - _lastTime) >= 1.0) {
+                _state = "none";
+            }
         } else {
-            _lastTime = _time;
-            shooterPID1Encoder._targetRPM = 0.0;
-            shooterPID1Encoder.stop();
             boxFlickerEncoderControls.stop();
             boxSlideTiltControls._currentBoxInShooterPos = false;
         }
@@ -90,7 +87,7 @@ public class ParallelActionsControls {
             armControls.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armControls._encoderArm = armControls.arm.getCurrentPosition();
 
-            if (armControls._encoderArm < 3500) {
+            if (armControls._encoderArm < 3700) {
                 armControls._powerArm = 1.0;
             } else {
                 armControls._powerArm = 0.0;
@@ -111,7 +108,7 @@ public class ParallelActionsControls {
             armControls.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             armControls._encoderArm = armControls.arm.getCurrentPosition();
 
-            if (armControls._encoderArm < 4200) {
+            if (armControls._encoderArm < 4500) {
                 armControls._powerArm = 1.0;
             } else {
                 armControls._powerArm = 0.0;
@@ -138,7 +135,7 @@ public class ParallelActionsControls {
         shooterPID1Encoder.addTelemetry(telemetry);
     }
 
-    public void stop (LinearOpMode op, double time) {
+    public void stop () {
         shooterPID1Encoder._targetRPM = 0.0;
         shooterPID1Encoder.stop();
         armControls.arm.setPower(0.0);

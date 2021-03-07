@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.vuforia.CameraDevice;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -68,8 +69,14 @@ public class TensorFlowTest extends LinearOpMode {
 
             // Uncomment the following line if you want to adjust the magnification and/or the aspect ratio of the input images.
             //tfod.setZoom(2.5, 1.78);
+            tfod.setClippingMargins(0,250,0,0);
+            //                      L T R B
+
         }
 
+        tfod.setClippingMargins(0,250,0,0);
+        //                      L T R B
+        CameraDevice.getInstance().setFlashTorchMode(true);
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
@@ -77,6 +84,9 @@ public class TensorFlowTest extends LinearOpMode {
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
+                tfod.setClippingMargins(0,250,0,0);
+                //                      L T R B
+                CameraDevice.getInstance().setFlashTorchMode(true);
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -100,6 +110,7 @@ public class TensorFlowTest extends LinearOpMode {
         }
 
         if (tfod != null) {
+            CameraDevice.getInstance().setFlashTorchMode(false);
             tfod.shutdown();
         }
     }

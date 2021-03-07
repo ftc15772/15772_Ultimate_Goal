@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode.odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @Autonomous(name = "My Odometry OpMode")
+@Disabled
 public class MyOdometryOpmode extends LinearOpMode {
     //Drive motors
     DcMotor right_front, right_back, left_front, left_back;

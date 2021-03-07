@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testteleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.drivebase.GyroSensor;
 
 @TeleOp(name = "Gyro Sensor Test", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class GyroTeleop extends LinearOpMode {
 
     private GyroSensor gyroSensor = new GyroSensor();

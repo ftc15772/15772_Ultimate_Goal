@@ -1,12 +1,13 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testteleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.odometry.OdometryControls;
 
 @TeleOp(name = "Odometry Test Teleop", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class OdometryTestTeleop extends LinearOpMode {
 
     double _time = 0.0;

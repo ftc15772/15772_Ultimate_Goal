@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.drivebase.MecanumDrivebase;
 import org.firstinspires.ftc.teamcode.intake.ComplicatedSnowplowControls;
 import org.firstinspires.ftc.teamcode.intake.IntakeControls;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControlsNew;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerPositionModeControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
 import org.firstinspires.ftc.teamcode.shooter.DeflectorControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
 
 
-@TeleOp(name = "Full Robot Teleop (NEW)", group = "Linear Opmode")
+@TeleOp(name = "**Full Robot Teleop (NEW)", group = "Linear Opmode")
 //@Disabled
 public class FullRobotTeleop3 extends LinearOpMode {
 
@@ -24,7 +24,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
     //private GyroSensor gyroSensor = new GyroSensor();
     //private OdometryControls odometryControls = new OdometryControls();
     private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
-    private BoxFlickerEncoderControlsNew flickerControls = new BoxFlickerEncoderControlsNew();
+    private BoxFlickerPositionModeControls boxFlickerPositionModeControls = new BoxFlickerPositionModeControls();
     private ArmControls armControls = new ArmControls();
     private IntakeControls intakeControls = new IntakeControls();
     private ComplicatedSnowplowControls plowControls = new ComplicatedSnowplowControls();
@@ -40,7 +40,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
         //gyroSensor.initialize(this);
         //odometryControls.initialize(this);
         shooterPID1Encoder.initialize(this);
-        flickerControls.initialize(this);
+        boxFlickerPositionModeControls.initialize(this);
         plowControls.initialize(this);
         armControls.initialize(this);
         intakeControls.initialize(this);
@@ -58,7 +58,6 @@ public class FullRobotTeleop3 extends LinearOpMode {
         //gyroSensor.startControl();
         //odometryControls.startControl(telemetry, this);
         shooterPID1Encoder.startControl();
-        flickerControls.startControl();
         gripperControls.startControl();
         intakeControls.startControl();
         //armControls.startControl();
@@ -77,7 +76,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
 
 
             shooterPID1Encoder.readController(gamepad2);
-            flickerControls.readController(gamepad2);
+            boxFlickerPositionModeControls.readController(gamepad2);
             boxSlideTiltControls.readController(gamepad2);
             armControls.readController(gamepad2);
             plowControls.readController(gamepad2);
@@ -93,7 +92,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
             mecanumDrivebase.whileOpModeIsActive(this);
             //odometryControls.whileOpModeIsActive(this);
             shooterPID1Encoder.whileOpModeIsActive(this);
-            flickerControls.whileOpModeIsActive(this, _time);
+            boxFlickerPositionModeControls.whileOpModeIsActive(this);
             boxSlideTiltControls.whileOpModeIsActive(this, _time);
             intakeControls.whileOpModeIsActive(this);
             armControls.whileOpModeIsActive(this);
@@ -106,7 +105,7 @@ public class FullRobotTeleop3 extends LinearOpMode {
 
             //mecanumDrivebase.addTelemetry(telemetry);
             shooterPID1Encoder.addTelemetry(telemetry);
-            flickerControls.addTelemetry(telemetry, _time);
+            boxFlickerPositionModeControls.addTelemetry(telemetry);
             deflectorControls.addTelemetry(telemetry);
             //armControls.addTelemetry(telemetry);
             //intakeControls.addTelemetry(telemetry);
@@ -122,7 +121,6 @@ public class FullRobotTeleop3 extends LinearOpMode {
         mecanumDrivebase.stop();
         shooterPID1Encoder.stop();
         //odometryControls.stop();
-        flickerControls.stop();
         intakeControls.stop();
         armControls.stop();
 

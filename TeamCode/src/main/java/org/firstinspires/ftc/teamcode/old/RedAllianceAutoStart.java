@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,6 +21,7 @@ import java.util.List;
  * Created by Sarthak on 10/4/2019.
  */
 @Autonomous(name = "Red Alliance Auto Start")
+@Disabled
 public class RedAllianceAutoStart extends LinearOpMode {
 
     private MecanumDrivebase mecanumDrivebase = new MecanumDrivebase();

@@ -12,9 +12,9 @@ public class DeflectorControls {
 
     private double _lowestPos = 1.0;
     private double _highestPos = 0.0;
-    public double _highGoalPos = 0.3;
-    public double _highGoalPosAuto = 0.35;
-    public double _powerShotPos = 0.6;
+    public double _highGoalPos = 0.24;
+    public double _highGoalPosAuto = 0.26;
+    public double _powerShotPos = 0.7;
     private double _servoPos;
     private boolean _a = false;
     private boolean _start = false;
@@ -36,18 +36,12 @@ public class DeflectorControls {
 
     public void readController (Gamepad gamepad) {
         if (gamepad.a && !_a) {
-            _servoPos = _highGoalPos;
-
-            /* if (_currentPosition == 2) {
-                _servoPos = _lowestPos;
-                _currentPosition = 1;
-            } else if (_currentPosition == 1) {
-                _servoPos = _highestPos;
-                _currentPosition = 3;
-            } else if (_currentPosition == 3) {
+            if (_servoPos < 0.45) {
+                _servoPos = _powerShotPos;
+            } else {
                 _servoPos = _highGoalPos;
-                _currentPosition = 2;
-            } */
+
+            }
 
         } else if (gamepad.start && !_start) {
             if (_servoPos > _highestPos) {
@@ -73,6 +67,11 @@ public class DeflectorControls {
     }
 
     public void addTelemetry (Telemetry telemetry) {
+        if (_servoPos < 0.45) {
+            telemetry.addData("Deflecter Pos", "High Goal");
+        } else {
+            telemetry.addData("Deflecter Pos", "Power Shots");
+        }
         telemetry.addData("Deflector Actual Position", deflector.getPosition());
         telemetry.addData("Deflector Target Position", _servoPos);
     }

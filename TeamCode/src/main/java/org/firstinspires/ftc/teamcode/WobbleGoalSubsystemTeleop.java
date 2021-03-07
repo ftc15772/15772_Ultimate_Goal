@@ -6,9 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.wobblegoal.ArmControls;
 import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
 
-@TeleOp(name = "Wobble Goal Arm Teleop", group = "Linear Opmode")
+@TeleOp(name = "Wobble Goal Subsystem Test", group = "Linear Opmode")
 //@Disabled
-public class WobbleGoalArmTeleop extends LinearOpMode {
+public class WobbleGoalSubsystemTeleop extends LinearOpMode {
 
     private ArmControls armControls = new ArmControls();
     private GripperControls gripperControls = new GripperControls();

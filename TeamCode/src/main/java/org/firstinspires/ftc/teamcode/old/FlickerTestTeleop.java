@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,7 +8,7 @@ import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControlsNew;
 
 
 @TeleOp(name = "Flicker Test Teleop", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class FlickerTestTeleop extends LinearOpMode {
 
     double _time = 0.0;

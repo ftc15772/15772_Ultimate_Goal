@@ -3,15 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControlsNew;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerPositionModeControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
 import org.firstinspires.ftc.teamcode.shooter.DeflectorControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
 
 
-@TeleOp(name = "Shooter Test (Auto vs Teleop)", group = "Linear Opmode")
+@TeleOp(name = "Shooting Subsystem Test", group = "Linear Opmode")
 //@Disabled
-public class ShooterTestTeleop_2_24 extends LinearOpMode {
+public class ShootingSubsystemTestTeleop extends LinearOpMode {
 
     double _time = 0.0;
     public boolean _dpadUp = false;
@@ -19,7 +19,7 @@ public class ShooterTestTeleop_2_24 extends LinearOpMode {
     public String shooterState = "off";
 
     private ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
-    private BoxFlickerEncoderControlsNew flickerControls = new BoxFlickerEncoderControlsNew();
+    private BoxFlickerPositionModeControls boxFlickerPositionModeControls = new BoxFlickerPositionModeControls();
     private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
     private DeflectorControls deflectorControls = new DeflectorControls();
 
@@ -27,7 +27,7 @@ public class ShooterTestTeleop_2_24 extends LinearOpMode {
     public void runOpMode() {
 
         shooterPID1Encoder.initialize(this);
-        flickerControls.initialize(this);
+        boxFlickerPositionModeControls.initialize(this);
         boxSlideTiltControls.initialize(this);
         deflectorControls.initialize(this);
 
@@ -35,7 +35,7 @@ public class ShooterTestTeleop_2_24 extends LinearOpMode {
         waitForStart();
 
         shooterPID1Encoder.startControl();
-        flickerControls.startControl();
+        boxFlickerPositionModeControls.startControl();
 
         while(opModeIsActive()) {
 
@@ -60,17 +60,17 @@ public class ShooterTestTeleop_2_24 extends LinearOpMode {
 
 
             shooterPID1Encoder.readController(gamepad2);
-            flickerControls.readController(gamepad2);
+            boxFlickerPositionModeControls.readController(gamepad2);
             boxSlideTiltControls.readController(gamepad2);
             deflectorControls.readController(gamepad2);
 
             shooterPID1Encoder.whileOpModeIsActive(this);
-            flickerControls.whileOpModeIsActive(this, _time);
+            boxFlickerPositionModeControls.whileOpModeIsActive(this);
             boxSlideTiltControls.whileOpModeIsActive(this, _time);
             deflectorControls.whileOpModeIsActive(this);
 
             shooterPID1Encoder.addTelemetry(telemetry);
-            flickerControls.addTelemetry(telemetry, _time);
+            boxFlickerPositionModeControls.addTelemetry(telemetry);
             deflectorControls.addTelemetry(telemetry);
 
             telemetry.addData("Opmode Timer (ms)", _time);
@@ -79,7 +79,7 @@ public class ShooterTestTeleop_2_24 extends LinearOpMode {
         }
 
         shooterPID1Encoder.stop();
-        flickerControls.stop();
+        boxFlickerPositionModeControls.stop();
 
     }
 

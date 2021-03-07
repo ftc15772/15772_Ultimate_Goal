@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.testteleop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,7 +8,7 @@ import org.firstinspires.ftc.teamcode.drivebase.GyroSensor;
 import org.firstinspires.ftc.teamcode.drivebase.MecanumDrivebase;
 
 @TeleOp(name = "Vector Mecanum Drive", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class MecanumTeleop extends LinearOpMode {
 
     private MecanumDrivebase mecanumDrivebase = new MecanumDrivebase();

@@ -13,7 +13,7 @@ public class BoxSlideTiltControls {
 
     private double _slideOut = 0.27;
     private double _slideIn = 1.0;
-    private double _tiltUp = 0.8;
+    private double _tiltUp = 0.82;
     private double _tiltDown = 0.05;
     public boolean _sliderIn = true;
     public boolean _tiltingDown = true;

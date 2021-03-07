@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerEncoderControls;
+import org.firstinspires.ftc.teamcode.ringtransfer.BoxFlickerPositionModeControls;
 import org.firstinspires.ftc.teamcode.ringtransfer.BoxSlideTiltControls;
 import org.firstinspires.ftc.teamcode.shooter.DeflectorControls;
 import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
@@ -18,7 +18,7 @@ public class ParallelActionsControls {
     private GripperControls gripperControls = new GripperControls();
     public ShooterPID1Encoder shooterPID1Encoder = new ShooterPID1Encoder();
     private BoxSlideTiltControls boxSlideTiltControls = new BoxSlideTiltControls();
-    private BoxFlickerEncoderControls boxFlickerEncoderControls = new BoxFlickerEncoderControls();
+    public BoxFlickerPositionModeControls boxFlickerPositionModeControls = new BoxFlickerPositionModeControls();
     private DeflectorControls deflectorControls = new DeflectorControls();
     // variables below
     public String _state = "none";
@@ -29,7 +29,7 @@ public class ParallelActionsControls {
         gripperControls.initialize(op);
         shooterPID1Encoder.initialize(op);
         boxSlideTiltControls.initialize(op);
-        boxFlickerEncoderControls.initialize(op);
+        boxFlickerPositionModeControls.initialize(op);
         deflectorControls.initialize(op);
         deflectorControls.deflector.setPosition(deflectorControls._highGoalPosAuto);
     }
@@ -48,14 +48,47 @@ public class ParallelActionsControls {
             boxSlideTiltControls._currentBoxInShooterPos = true;
             boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
         } else if (_state == "shoot3Rings") {
-            shooterPID1Encoder.shooterAuto2(op, 3600);
-            boxFlickerEncoderControls.flicker.setPower(-1.0);
-            shooterPID1Encoder.addTelemetry(telemetry);
-            if ((_time - _lastTime) >= 1.0) {
+            /*
+            if ((_time - _lastTime) <= 1.0) {
+                shooterPID1Encoder.shooterAuto2(op, 3600);
+                shooterPID1Encoder.addTelemetry(telemetry);
+            } else if (((_time - _lastTime) <= 2.0) && ((_time - _lastTime) > 1.0)) {
+                shooterPID1Encoder.shooterAuto2(op, 3600);
+                boxFlickerPositionModeControls.flickThreeRings();
+                shooterPID1Encoder.addTelemetry(telemetry);
+            } else {
                 _state = "none";
             }
+            */
+
+
+            /*
+            boxFlickerPositionModeControls.flickOneRing();
+            op.sleep(300);
+            boxFlickerPositionModeControls.flickOneRing();
+            op.sleep(300);
+            boxFlickerPositionModeControls.flickOneRing();
+            op.sleep(300);
+            _state = "none";
+            */
+
+            shooterPID1Encoder.shooterAuto2(op, 3600);
+
+            if (((_time - _lastTime) >= 1.0) && (boxFlickerPositionModeControls._ringsFlicked == 2)) {
+                boxFlickerPositionModeControls.flickOneRing();
+            } else if (((_time - _lastTime) >= 0.5) && (boxFlickerPositionModeControls._ringsFlicked == 1)) {
+                boxFlickerPositionModeControls.flickOneRing();
+            } else if (((_time - _lastTime) >= 0) && (boxFlickerPositionModeControls._ringsFlicked == 0)) {
+                boxFlickerPositionModeControls.flickOneRing();
+            }
+            shooterPID1Encoder.addTelemetry(telemetry);
+            if ((_time - _lastTime) >= 1.5) {
+                _state = "none";
+
+            }
+
+
         } else {
-            boxFlickerEncoderControls.stop();
             boxSlideTiltControls._currentBoxInShooterPos = false;
         }
     }
@@ -72,6 +105,16 @@ public class ParallelActionsControls {
 
             double _time = time;
             armControls.arm.setPower(0);
+
+            /* if (boxFlickerPositionModeControls._ringsFlicked == 3) {
+                boxFlickerPositionModeControls._ringsFlicked = 0;
+                boxFlickerPositionModeControls.flicker.setPosition(1.0);
+            } else if ((boxFlickerPositionModeControls._ringsFlicked == 0) || ((_time - _lastTime) >= 0.25)) {
+                boxSlideTiltControls._currentBoxInShooterPos = false;
+                boxSlideTiltControls._lastBoxInShooterPos = true;
+                boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
+            }
+             */
             boxSlideTiltControls._currentBoxInShooterPos = false;
             boxSlideTiltControls._lastBoxInShooterPos = true;
             boxSlideTiltControls.whileOpModeIsActive(op, _time / 1000);
@@ -139,7 +182,6 @@ public class ParallelActionsControls {
         shooterPID1Encoder._targetRPM = 0.0;
         shooterPID1Encoder.stop();
         armControls.arm.setPower(0.0);
-        boxFlickerEncoderControls.stop();
         boxSlideTiltControls._currentBoxInShooterPos = false;
         //boxSlideTiltControls.whileOpModeIsActive(op, time);
     }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.old;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.teamcode.wobblegoal.GripperControls;
 
 //Testing Sourcetree 1/30/21
 @TeleOp(name = "Full Robot Teleop", group = "Linear Opmode")
-//@Disabled
+@Disabled
 public class FullRobotTeleop2 extends LinearOpMode {
 
     double _time = 0.0;

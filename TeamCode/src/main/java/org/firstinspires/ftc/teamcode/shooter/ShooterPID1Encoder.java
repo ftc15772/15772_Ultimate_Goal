@@ -157,7 +157,7 @@ public class ShooterPID1Encoder {
         if (_manualPowerSet == false) {
             _Integral += (_error * _deltaTime); // Different in red auto vs teleop / shooter test auto
         } else {
-            _Integral = 2200;
+            _Integral = 2300;
             _countManual += 1;
             if (_countManual >= 7) {
                 _manualPowerSet = false;
@@ -205,15 +205,15 @@ public class ShooterPID1Encoder {
     }
 
     public void addTelemetry (Telemetry telemetry) {
-        telemetry.addData("Power Not Clipped", _powerNotClipped);
-        telemetry.addData("Integral", _Integral); // For 3000 RPM -> Around 2500 for teleop and ShooterTestOdometry; over 6500 for Red Auto
-        telemetry.addData("Error x Delta Time", _error * _deltaTime);
-        telemetry.addData("Error", _error);
-        telemetry.addData("Delta Time", _deltaTime);
+        //telemetry.addData("Power Not Clipped", _powerNotClipped);
+        //telemetry.addData("Integral", _Integral); // For 3000 RPM -> Around 2500 for teleop and ShooterTestOdometry; over 6500 for Red Auto
+        //telemetry.addData("Error x Delta Time", _error * _deltaTime);
+        //telemetry.addData("Error", _error);
+        //telemetry.addData("Delta Time", _deltaTime);
         telemetry.addData("Target RPM", "%.03f rpm", _targetRPM);
         telemetry.addData("Measured RPM", "%.03f rpm", _measuredRPM);
         telemetry.addData("Target TPS", "%.03f tps", _targetTicksPerSecond);
         telemetry.addData("Measured TPS", "%.03f tps", _measuredTicksPerSecond);
-        telemetry.addData("Power", "%.03f %%", _currentPower);
+        //telemetry.addData("Power", "%.03f %%", _currentPower);
     }
 }

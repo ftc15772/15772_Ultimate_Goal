@@ -1,5 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.old;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -7,7 +8,7 @@ import org.firstinspires.ftc.teamcode.shooter.ShooterPID1Encoder;
 
 @TeleOp(name="Shooter RPM with Helper", group="Linear Opmode")
 
-//@Disabled
+@Disabled
 public class ShooterRPMWithHelper extends LinearOpMode {
 
     private ShooterPID1Encoder shooterControls = new ShooterPID1Encoder();

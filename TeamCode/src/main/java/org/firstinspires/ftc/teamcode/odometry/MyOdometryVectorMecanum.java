@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.odometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -8,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.auto.ParallelActionsControls;
 
 @Autonomous(name = "My Odometry Vector Mecanum")
+@Disabled
 public class MyOdometryVectorMecanum extends LinearOpMode {
 
     private ParallelActionsControls parallelActionsControls = new ParallelActionsControls();
